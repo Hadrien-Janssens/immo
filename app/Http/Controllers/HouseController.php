@@ -1,0 +1,67 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\House;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+
+class HouseController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        return Inertia::render('House/Index', [
+            'houses' => House::with('images')->get(),
+        ]);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(House $house) {}
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(House $house)
+    {
+        return Inertia::render('House/Edit', [
+            'house' => $house->load('images'),
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, House $house)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(House $house)
+    {
+        //
+    }
+}
