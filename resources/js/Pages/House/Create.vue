@@ -90,16 +90,25 @@
                         <InputLabel for="img" value="Photos" />
                         <!-- Preview des images -->
                         <div class="col-span-6 sm:col-span-4 mt-4">
-                            <div v-if="previews.length">
+                            <div
+                                v-if="previews.length"
+                                class="flex gap-3 overflow-scroll p-1 py-3"
+                            >
                                 <div
                                     v-for="(preview, index) in previews"
                                     :key="index"
-                                    class="mb-4"
+                                    class="mb-4 relative"
                                 >
+                                    <button
+                                        class="absolute -right-1 -top-1 rounded-full border w-5 h-5 bg-red-500 border-none font-extrabold text-white flex justify-center items-cente text-xs"
+                                        @click="cancelImg(index)"
+                                    >
+                                        x
+                                    </button>
                                     <img
                                         :src="preview"
                                         alt="Image Preview"
-                                        class="w-32 h-32 object-cover"
+                                        class="w-32 h-32 object-cover rounded"
                                     />
                                 </div>
                             </div>
@@ -149,7 +158,6 @@ const previews = ref([]);
 
 const handleImageChange = (event) => {
     const files = event.target.files;
-    previews.value = [];
 
     for (let i = 0; i < files.length; i++) {
         const reader = new FileReader();
@@ -159,9 +167,14 @@ const handleImageChange = (event) => {
         };
 
         reader.readAsDataURL(files[i]);
+        house.images.push(files[i]);
     }
+    //reset input
+    event.target.value = "";
+};
 
-    house.images = files;
-    console.log(house.images);
+const cancelImg = (index) => {
+    previews.value.splice(index, 1);
+    house.images.splice(index, 1);
 };
 </script>

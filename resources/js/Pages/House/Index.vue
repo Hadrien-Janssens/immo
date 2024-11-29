@@ -19,13 +19,13 @@ const props = defineProps({ houses: Array });
             <li
                 v-for="house in houses"
                 :key="house.id"
-                class="border p-5 rounded-md my-2 max-w-6xl m-auto"
+                class="border p-5 rounded-md my-2 max-w-6xl m-auto w-full md:h-96"
             >
                 <Link
                     :href="route('house.edit', { house })"
-                    class="flex flex-col md:flex-row gap-3 md:justify-center"
+                    class="flex flex-col md:flex-row gap-3 md:justify-center h-full"
                 >
-                    <figure class="basis-1/2">
+                    <figure class="basis-1/2 h-full">
                         <img
                             :src="house.images[0]?.url"
                             :alt="house.title"
