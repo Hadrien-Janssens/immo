@@ -10,6 +10,15 @@ class House extends Model
     /** @use HasFactory<\Database\Factories\HouseFactory> */
     use HasFactory;
 
+    protected $fillable = [
+        'title',
+        'description',
+        'address',
+        'size',
+        'bedrooms',
+        'price',
+    ];
+
     public function images()
     {
         return $this->hasMany(Image::class);

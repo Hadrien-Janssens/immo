@@ -1,7 +1,10 @@
 <template>
     <AppLayout>
-        <form @submit.prevent="form.put(route('house.update', props.house))">
-            <div class="mt-5 md:mt-0 md:col-span-2 max-w-6xl m-auto">
+        <form
+            @submit.prevent="house.post(route('house.store'), house)"
+            enctype="multipart/form-data"
+        >
+            <div class="mt-5 md:mt-0 md:col-span-2">
                 <div class="px-4 py-5 bg-white sm:p-6 shadow">
                     <!-- title -->
                     <div class="col-span-6 sm:col-span-4">
@@ -9,8 +12,8 @@
                         <TextInput
                             id="title"
                             type="text"
-                            v-model="form.title"
                             class="mt-1 block w-full"
+                            v-model="house.title"
                             required
                         />
                         <InputError message="" class="mt-2" />
@@ -22,7 +25,7 @@
                         <TextInput
                             id="description"
                             type="text"
-                            v-model="form.description"
+                            v-model="house.description"
                             class="mt-1 block w-full"
                             required
                         />
@@ -34,7 +37,7 @@
                         <TextInput
                             id="address"
                             type="text"
-                            v-model="form.address"
+                            v-model="house.address"
                             class="mt-1 block w-full"
                             required
                         />
@@ -47,7 +50,7 @@
                             <TextInput
                                 id="size"
                                 type="number"
-                                v-model="form.size"
+                                v-model="house.size"
                                 class="mt-1 block w-full"
                                 required
                             />
@@ -55,11 +58,14 @@
                         </div>
                         <!-- rooms -->
                         <div class="col-span-6 sm:col-span-4">
-                            <InputLabel for="rooms" value="nombre de chambre" />
+                            <InputLabel
+                                for="bedrooms"
+                                value="nombre de chambre"
+                            />
                             <TextInput
-                                id="rooms"
+                                id="bedrooms"
                                 type="number"
-                                v-model="form.bedrooms"
+                                v-model="house.bedrooms"
                                 class="mt-1 block w-full"
                                 required
                             />
@@ -71,7 +77,7 @@
                             <TextInput
                                 id="price"
                                 type="number"
-                                v-model="form.price"
+                                v-model="house.price"
                                 class="mt-1 block w-full"
                                 required
                             />
@@ -80,54 +86,82 @@
                     </div>
 
                     <!-- img -->
-                    <div class="flex overflow-scroll my-2">
-                        <img
-                            v-for="img in form.images"
-                            :src="img.url"
-                            alt=""
-                            class="basis-1/2"
-                        />
-                    </div>
                     <div class="col-span-6 sm:col-span-4">
-                        <InputLabel for="img" value="ajouter un photos" />
-                        <input id="img" type="file" class="mt-1 block w-full" />
+                        <InputLabel for="img" value="Photos" />
+                        <!-- Preview des images -->
+                        <div class="col-span-6 sm:col-span-4 mt-4">
+                            <div v-if="previews.length">
+                                <div
+                                    v-for="(preview, index) in previews"
+                                    :key="index"
+                                    class="mb-4"
+                                >
+                                    <img
+                                        :src="preview"
+                                        alt="Image Preview"
+                                        class="w-32 h-32 object-cover"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <input
+                            id="img"
+                            type="file"
+                            class="mt-1 block w-full"
+                            @change="handleImageChange"
+                            multiple
+                        />
                         <InputError message="" class="mt-2" />
                     </div>
 
-                    <div class="flex justify-between mt-5">
-                        <SecondaryButton @click="deleteHouse"
-                            >supprimer</SecondaryButton
-                        >
-                        <div class="flex items-center gap-2">
-                            <ActionMessage on="" class="me-3">
-                                Saved.
-                            </ActionMessage>
-                            <PrimaryButton>
-                                sauvegarder les modifications
-                            </PrimaryButton>
-                        </div>
-                    </div>
+                    <!-- save btn-->
+                    <ActionMessage on="" class="me-3"> Saved. </ActionMessage>
+
+                    <PrimaryButton> Save </PrimaryButton>
                 </div>
             </div>
         </form>
     </AppLayout>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import ActionMessage from "@/Components/ActionMessage.vue";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { Inertia } from "@inertiajs/inertia";
 import { useForm } from "@inertiajs/vue3";
+import { ref } from "vue";
 
-const props = defineProps(["house"]);
-const form = useForm(props.house);
+const house = useForm({
+    title: "",
+    description: "",
+    address: "",
+    size: "0",
+    bedrooms: "0",
+    price: "0",
+    images: [],
+});
 
-const deleteHouse = () => {
-    Inertia.delete(route("house.destroy", props.house.id));
+const previews = ref([]);
+
+const handleImageChange = (event) => {
+    const files = event.target.files;
+    previews.value = [];
+
+    for (let i = 0; i < files.length; i++) {
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            previews.value.push(e.target.result);
+        };
+
+        reader.readAsDataURL(files[i]);
+    }
+
+    house.images = files;
+    console.log(house.images);
 };
 </script>

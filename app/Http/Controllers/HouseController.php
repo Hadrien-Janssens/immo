@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\House;
+use App\Models\Image;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -23,7 +24,7 @@ class HouseController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('House/Create');
     }
 
     /**
@@ -31,7 +32,38 @@ class HouseController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validateData = $request->validate([
+            'title' => 'required',
+            'description' => 'required',
+            'address' => 'required',
+            'size' => 'required',
+            'bedrooms' => 'required',
+            'price' => 'required',
+            'images' => '',
+        ]);
+
+        $house = House::create($validateData);
+
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $url = $image->store('images', 'public');
+                $house->images()->create(['url' => $url]);
+            }
+        }
+        $images = [];
+
+        // foreach ($house['images'] as $image) {
+        //     dd($image);
+        //     $url = $image->file('images')->store('images', 'public');
+
+        //     $images[] = [
+        //         'url' => $url,
+        //         'house_id' => $house->id,
+        //     ];
+        // }
+        // $house->images()->createMany($images);
+        return  redirect()->route('house.index');
     }
 
     /**
@@ -54,7 +86,7 @@ class HouseController extends Controller
      */
     public function update(Request $request, House $house)
     {
-        //
+        dd($request->all());
     }
 
     /**
@@ -62,6 +94,8 @@ class HouseController extends Controller
      */
     public function destroy(House $house)
     {
-        //
+        $house->delete();
+
+        return redirect()->route('house.index');
     }
 }
